@@ -12,8 +12,11 @@ PBL_APP_INFO(MY_UUID,
 
 Window window;
 TextLayer timeLayer;
+TextLayer stopWatchLayer;
 
 static char hourText[] = "00:00"; //variable for storing time
+static char stopWatchText[] = "00:00:00";
+int elapsedSeconds = 0;
 
 void setTime(PblTm *t) {
  
@@ -25,6 +28,14 @@ void setTime(PblTm *t) {
 	//Set the TextLayer text
 	
 	text_layer_set_text(&timeLayer, hourText);
+	
+}
+
+
+void setStopWatch(elapsedTime) {
+
+//elapsed time into human readable
+text_layer_set_text(&stopWatchLayer, elapsedTime);
 }
 
 void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t)
@@ -37,6 +48,8 @@ void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t)
 	if (seconds == 0)
 		setTime(t->tick_time);
 
+	elapsedSeconds++;
+	setStopWatch(elapsedSeconds)
 }
 
 void handle_init(AppContextRef ctx) {
@@ -56,15 +69,22 @@ void handle_init(AppContextRef ctx) {
 	text_layer_set_text_alignment(&timeLayer, GTextAlignmentLeft);
 
 	//Stopwatch layer
+	text_layer_init(&stopWatchLayer, GRect(30, 65, 150, 50));
+	text_layer_set_background_color(&stopWatchLayer, GColorClear);
+	text_layer_set_text_color(&stopWatchLayer, GColorWhite);
+	text_layer_set_font(&stopWatchLayer,
+	fonts_get_system_font(FONT_KEY_BITHAM_30_BLACK));
+	text_layer_set_text_alignment(&stopWatchLayer, GTextAlignmentLeft);
+	
 	
 	//Add to window
 	layer_add_child(&window.layer, &timeLayer.layer);
- 
+	layer_add_child(&window.layer, &stopWatchLayer.layer);
 	//Set initial time so display isn't blank
 	PblTm time;
 	get_time(&time);
 	setTime(&time);
-	
+	setStopWatch(elapsedSeconds);
 }
 
 
